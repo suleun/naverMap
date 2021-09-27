@@ -87,6 +87,21 @@
             padding: 10px;
             font-size: smaller;
         }
+        
+         .btn-sparta {
+            color: #fff;
+            background-color: #e8344e;
+            border-color: #e8344e;
+        }
+
+        i {
+            color: #e8344e;
+        }
+
+
+        i:hover {
+            cursor: pointer;
+        }
 
     </style>
     <script>
@@ -113,15 +128,29 @@
         })
 
       function make_card(i, matjip) {
-        let html_temp = `<div class="card" id="card-${i}">
-                            <div class="card-body">
-                                <h5 class="card-title"><a href="javascript:click2center('${i}')" class="matjip-title">${matjip['title']}</a></h5>
-                                <h6 class="card-subtitle mb-2 text-muted">${matjip['category']}</h6>
-                                <p class="card-text">${matjip['address']}</p>
-                                <p class="card-text" style="color:blue;">${matjip['show']}</p>
-                            </div>
-                         </div>`;
-        $('#matjip-box').append(html_temp);
+     let html_temp = ``;
+            if ("liked" in matjip) {
+                html_temp = `<div class="card" id="card-${i}">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><a href="javascript:click2center(${i})" class="matjip-title">${matjip['title']}</a></h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">${matjip['category']}</h6>
+                                        <i class="fa fa-bookmark" onclick="bookmark('${matjip['title']}', '${matjip['address']}', 'unlike')"></i>
+                                        <p class="card-text">${matjip['address']}</p>
+                                        <p class="card-text" style="color:blue;">${matjip['show']}</p>
+                                    </div>
+                                 </div>`;
+            } else {
+                html_temp = `<div class="card" id="card-${i}">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><a href="javascript:click2center(${i})" class="matjip-title">${matjip['title']}</a></h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">${matjip['category']}</h6>
+                                        <i class="fa fa-bookmark-o" onclick="bookmark('${matjip['title']}', '${matjip['address']}', 'like')"></i>
+                                        <p class="card-text">${matjip['address']}</p>
+                                        <p class="card-text" style="color:blue;">${matjip['show']}</p>
+                                    </div>
+                                 </div>`;
+            }
+            $('#matjip-box').append(html_temp);
     }
 
         function get_matjips() {
@@ -193,6 +222,23 @@
                 map.setCenter(infowindow.position)
             }
         }
+        
+         function bookmark(title, address, action) {
+            $.ajax({
+                type: "POST",
+                url: "/like_matjip",
+                data: {
+                    title_give: title,
+                    address_give: address,
+                    action_give: action
+                },
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        get_matjips()
+                    }
+                }
+            })
+        }
 
     </script>
 
@@ -204,19 +250,15 @@
         <div class="d-flex flex-column align-items-center"
              style="background-color: rgba(0,0,0,0.5);width: 100%;height: 100%;">
             <h1 class="title mt-5 mb-2">스파르타 맛집 지도</h1>
+              <button type="button" onclick="get_matjips()" class="btn btn-sparta">
+                새로고침하고 더 많은 맛집 보기
+            </button>
         </div>
     </div>
     <div id="map"></div>
 
     <div class="matjip-list" id="matjip-box">
-        <div class="card" id="card-0">
-            <div class="card-body">
-                <h5 class="card-title"><a href="#" class="matjip-title">혼가츠</a></h5>
-                <h6 class="card-subtitle mb-2 text-muted">일식</h6>
-                <p class="card-text">서울 마포구 와우산로21길 36-6 (서교동)</p>
-                <p class="card-text" style="color:blue;">생방송 투데이</p>
-            </div>
-        </div>
+     
     </div>
 </div>
 
